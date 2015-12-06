@@ -41,15 +41,8 @@ class Game(object):
                 for x_offset in [-1, 0, 1]:
                     for y_offset in [-1, 0, 1]:
                         if x_offset != 0 or y_offset != 0:
-                            self.counts[x][y] += self._is_mine(x + x_offset, y + y_offset)
-
-    def _is_mine(self, x, y):
-        """Returns 1 if mine and 0 otherwise"""
-        if x < 0 or x == self.width:
-            return 0
-        if y < 0 or y == self.height:
-            return 0
-        return int(self.board[x][y])
+                            if not self._is_outside_board(x + x_offset, y + y_offset):
+                                self.counts[x][y] += int(self.board[x][y])
 
     def _update_board(self, x, y):
         """Finds all the squares to expose based on a selection"""
@@ -57,7 +50,6 @@ class Game(object):
         if self.counts[x][y] != 0:
             return Result(False, [Position(x, y, self.counts[x][y])])
 
-        # ToDo
         squares = []
         stack = [(x, y)]
         while stack.count() > 0:
@@ -67,9 +59,22 @@ class Game(object):
                     if x_offset != 0 or y_offset != 0:
                         new_x = x + x_offset
                         new_y = y + y_offset
-                        if self.counts[new_x][new_y] == 0:
-                            stack.append((new_x, new_y))
+                        if not self._is_outside_board(new_x, new_y):
+                            self.exposed[x][y] = True
+                            if self._test_count(new_x. new_y):
+                                stack.append((new_x, new_y))
         return squares
+
+    def _test_count(self, x, y):
+        """Does this square have a count of zero?"""
+        return self.counts[x][y] == 0
+
+    def _is_outside_board(self, x, y):
+        if x < 0 or x == self.width:
+            return True
+        if y < 0 or y == self.height:
+            return True
+        return False
 
 
 class Position(object):
