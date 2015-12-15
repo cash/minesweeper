@@ -42,17 +42,17 @@ class Game(object):
                     for y_offset in [-1, 0, 1]:
                         if x_offset != 0 or y_offset != 0:
                             if not self._is_outside_board(x + x_offset, y + y_offset):
-                                self.counts[x][y] += int(self.board[x][y])
+                                self.counts[x][y] += int(self.board[x + x_offset][y + y_offset])
 
     def _update_board(self, x, y):
         """Finds all the squares to expose based on a selection"""
         self.exposed[x][y] = True
         if self.counts[x][y] != 0:
-            return Result(False, [Position(x, y, self.counts[x][y])])
+            return [Position(x, y, self.counts[x][y])]
 
         squares = []
         stack = [(x, y)]
-        while stack.count() > 0:
+        while len(stack) > 0:
             (x, y) = stack.pop()
             for x_offset in [-1, 0, 1]:
                 for y_offset in [-1, 0, 1]:
@@ -61,7 +61,7 @@ class Game(object):
                         new_y = y + y_offset
                         if not self._is_outside_board(new_x, new_y):
                             self.exposed[x][y] = True
-                            if self._test_count(new_x. new_y):
+                            if self._test_count(new_x, new_y):
                                 stack.append((new_x, new_y))
         return squares
 
@@ -78,13 +78,22 @@ class Game(object):
 
 
 class Position(object):
-    def __init__(self, x, y, neighbors):
+    def __init__(self, x, y, num_neighbors):
         self.x = x
         self.y = y
-        self.neighbors = neighbors
+        self.num_bomb_neighbors = num_neighbors
+
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y and self.num_bomb_neighbors == other.num_bomb_neighbors
 
 
 class Result(object):
     def __init__(self, explosion, new_squares=[]):
         self.explosion = explosion
         self.new_squares = new_squares
+
+    def __eq__(self, other):
+        if self.explosion != other.explosion:
+            return False
+        return set(self.new_squares) == set(other.new_squares)
+
