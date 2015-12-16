@@ -40,10 +40,6 @@ class MineSweeperTestCase(unittest.TestCase):
             ])
         self.reinit_game(game, board)
 
-        #boom
-        result = game.select(1, 0)
-        self.assertTrue(result.explosion)
-
         #expose only same square
         result = game.select(1, 1)
         self.assertFalse(result.explosion)
@@ -54,3 +50,18 @@ class MineSweeperTestCase(unittest.TestCase):
         result = game.select(0, 2)
         self.assertFalse(result.explosion)
         self.assertEqual(3, len(result.new_squares))
+        self.assertTrue(Position(0, 2, 0) in result.new_squares)
+        self.assertTrue(Position(0, 1, 1) in result.new_squares)
+        self.assertTrue(Position(1, 2, 1) in result.new_squares)
+
+        #select square already selected or exposed
+        self.assertIsNone(game.select(0, 2))
+        self.assertIsNone(game.select(1, 2))
+
+        #select outside the board
+        with self.assertRaises(ValueError):
+            game.select(2, 3)
+
+        #boom
+        result = game.select(1, 0)
+        self.assertTrue(result.explosion)

@@ -14,6 +14,8 @@ class Game(object):
         self._init_counts()
 
     def select(self, x, y):
+        if self._is_outside_board(x, y):
+            raise ValueError('Position ({0},{1}) is outside the board'.format(x, y))
         if self.exposed[x][y]:
             return None
         if self.board[x][y]:
@@ -45,12 +47,17 @@ class Game(object):
                                 self.counts[x][y] += int(self.board[x + x_offset][y + y_offset])
 
     def _update_board(self, x, y):
-        """Finds all the squares to expose based on a selection"""
-        self.exposed[x][y] = True
-        if self.counts[x][y] != 0:
-            return [Position(x, y, self.counts[x][y])]
+        """
+        Finds all the squares to expose based on a selection
 
-        squares = []
+        This uses an 8 neighbor region growing algorithm to expand the board if
+        the chosen square is not a neighbor to a mine.
+        """
+        self.exposed[x][y] = True
+        squares = [Position(x, y, self.counts[x][y])]
+        if self.counts[x][y] != 0:
+            return squares
+
         stack = [(x, y)]
         while len(stack) > 0:
             (x, y) = stack.pop()
@@ -60,9 +67,11 @@ class Game(object):
                         new_x = x + x_offset
                         new_y = y + y_offset
                         if not self._is_outside_board(new_x, new_y):
-                            self.exposed[x][y] = True
-                            if self._test_count(new_x, new_y):
-                                stack.append((new_x, new_y))
+                            if not self.exposed[new_x][new_y]:
+                                self.exposed[new_x][new_y] = True
+                                squares.append(Position(new_x, new_y, self.counts[new_x][new_y]))
+                                if self._test_count(new_x, new_y):
+                                    stack.append((new_x, new_y))
         return squares
 
     def _test_count(self, x, y):
