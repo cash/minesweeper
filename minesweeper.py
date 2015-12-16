@@ -9,26 +9,46 @@ class Game(object):
         self.board = [[False for y in xrange(height)] for x in xrange(width)]
         self.exposed = [[False for y in xrange(height)] for x in xrange(width)]
         self.counts = [[0 for y in xrange(height)] for x in xrange(width)]
+        self.num_safe_squares = self.width * self.height - self.num_mines
+        self.num_exposed_squares = 0
+        self.explosion = False
 
         self._place_mines()
         self._init_counts()
 
     def select(self, x, y):
+        """
+        Select a square to expose. Coordinates are zero based.
+        If the square has already been selected, returns None.
+        Returns a Result object with success/failure and a list of squares
+        exposed.
+        """
         if self._is_outside_board(x, y):
             raise ValueError('Position ({0},{1}) is outside the board'.format(x, y))
+        if self.explosion:
+            raise ValueError('Game is already over')
         if self.exposed[x][y]:
             return None
         if self.board[x][y]:
+            self.explosion = True
             return Result(True)
         return Result(False, self._update_board(x, y))
 
     def get_state(self):
+        """
+        Get the current state of the game
+        None means not exposed and the rest are counts
+        This does not contain the exploded mine if one exploded.
+        """
         state = [[None for y in xrange(self.height)] for x in xrange(self.width)]
         for x in xrange(self.width):
             for y in xrange(self.height):
                 if self.exposed[x][y]:
                     state[x][y] = self.counts[x][y]
         return state
+
+    def is_game_over(self):
+        return self.explosion or self.num_exposed_squares == self.num_safe_squares
 
     def _place_mines(self):
         for i in xrange(self.num_mines):
@@ -53,7 +73,7 @@ class Game(object):
         This uses an 8 neighbor region growing algorithm to expand the board if
         the chosen square is not a neighbor to a mine.
         """
-        self.exposed[x][y] = True
+        self._expose_square(x, y)
         squares = [Position(x, y, self.counts[x][y])]
         if self.counts[x][y] != 0:
             return squares
@@ -68,11 +88,15 @@ class Game(object):
                         new_y = y + y_offset
                         if not self._is_outside_board(new_x, new_y):
                             if not self.exposed[new_x][new_y]:
-                                self.exposed[new_x][new_y] = True
+                                self._expose_square(new_x, new_y)
                                 squares.append(Position(new_x, new_y, self.counts[new_x][new_y]))
                                 if self._test_count(new_x, new_y):
                                     stack.append((new_x, new_y))
         return squares
+
+    def _expose_square(self, x, y):
+        self.exposed[x][y] = True
+        self.num_exposed_squares += 1
 
     def _test_count(self, x, y):
         """Does this square have a count of zero?"""

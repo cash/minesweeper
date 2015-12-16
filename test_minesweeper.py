@@ -12,6 +12,8 @@ class MineSweeperTestCase(unittest.TestCase):
         game.board = board
         game.counts = [[0 for y in xrange(game.height)] for x in xrange(game.width)]
         game.exposed = [[False for y in xrange(game.height)] for x in xrange(game.width)]
+        game.explosion = False
+        game.num_exposed_squares = 0
         game._init_counts()
 
     def test_init_counts(self):
@@ -21,7 +23,7 @@ class MineSweeperTestCase(unittest.TestCase):
             [False, False, False, True,  False],
             [False, False, False, True,  False],
             [False, False, True,  False, False]
-            ])
+        ])
         counts = self.flip([
             [0, 1, 1, 1, 1],
             [1, 1, 2, 1, 2],
@@ -37,7 +39,7 @@ class MineSweeperTestCase(unittest.TestCase):
             [False, True,  False],
             [False, False, False],
             [False, False, True]
-            ])
+        ])
         self.reinit_game(game, board)
 
         #expose only same square
@@ -65,3 +67,52 @@ class MineSweeperTestCase(unittest.TestCase):
         #boom
         result = game.select(1, 0)
         self.assertTrue(result.explosion)
+
+        #select after game over
+        with self.assertRaises(ValueError):
+            game.select(2, 0)
+
+    def test_is_game_over(self):
+        game = Game(3, 3, 1)
+        board = self.flip([
+            [False, False, True],
+            [False, False, False],
+            [False, False, False]
+        ])
+        self.reinit_game(game, board)
+
+        #not over before we start
+        self.assertFalse(game.is_game_over())
+
+        #over after explosion
+        result = game.select(2, 0)
+        self.assertTrue(result.explosion)
+        self.assertTrue(game.is_game_over())
+
+        #over when all the squares have been revealed
+        self.reinit_game(game, board)
+        result = game.select(0, 0)
+        self.assertFalse(result.explosion)
+        self.assertEqual(8, len(result.new_squares))
+        self.assertTrue(game.is_game_over())
+
+    def test_get_state(self):
+        game = Game(3, 3, 3)
+        board = self.flip([
+            [False, False, True],
+            [False, False, False],
+            [True,  False, True]
+        ])
+        self.reinit_game(game, board)
+
+        game.select(0, 0)
+        expected = self.flip([
+          [0,    1,    None],
+          [1,    3,    None],
+          [None, None, None]
+        ])
+
+        state = game.get_state()
+        for x in [0, 1, 2]:
+            for y in [0, 1, 2]:
+                self.assertEqual(expected[x][y], state[x][y])
