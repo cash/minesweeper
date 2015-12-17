@@ -1,14 +1,23 @@
 import random
+from abc import ABCMeta, abstractmethod
 
 
-class Game(object):
-    def __init__(self, width, height, num_mines):
+class GameConfig(object):
+    def __init__(self, width=8, height=8, num_mines=10):
         self.width = width
         self.height = height
         self.num_mines = num_mines
-        self.board = [[False for y in xrange(height)] for x in xrange(width)]
-        self.exposed = [[False for y in xrange(height)] for x in xrange(width)]
-        self.counts = [[0 for y in xrange(height)] for x in xrange(width)]
+
+
+class Game(object):
+    def __init__(self, config):
+        self.width = config.width
+        self.height = config.height
+        self.num_mines = config.num_mines
+        self.board = [[False for y in xrange(self.height)] for x in xrange(self.width)]
+        self.exposed = [[False for y in xrange(self.height)] for x in xrange(self.width)]
+        self.counts = [[0 for y in xrange(self.height)] for x in xrange(self.width)]
+        self.num_moves = 0
         self.num_safe_squares = self.width * self.height - self.num_mines
         self.num_exposed_squares = 0
         self.explosion = False
@@ -29,10 +38,11 @@ class Game(object):
             raise ValueError('Game is already over')
         if self.exposed[x][y]:
             return None
+        self.num_moves += 1
         if self.board[x][y]:
             self.explosion = True
-            return Result(True)
-        return Result(False, self._update_board(x, y))
+            return MoveResult(True)
+        return MoveResult(False, self._update_board(x, y))
 
     def get_state(self):
         """
@@ -120,7 +130,7 @@ class Position(object):
         return self.x == other.x and self.y == other.y and self.num_bomb_neighbors == other.num_bomb_neighbors
 
 
-class Result(object):
+class MoveResult(object):
     def __init__(self, explosion, new_squares=[]):
         self.explosion = explosion
         self.new_squares = new_squares
@@ -130,3 +140,53 @@ class Result(object):
             return False
         return set(self.new_squares) == set(other.new_squares)
 
+
+class GameResult(object):
+    def __init__(self, success, num_moves):
+        self.success = success
+        self.num_moves = num_moves
+
+
+class GameAI(object):
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def init(self, config):
+        """
+        Initialize an AI to play a new game
+        config is a GameConfig object
+        return is void
+        """
+        pass
+
+    @abstractmethod
+    def next(self):
+        """
+        Returns the next move as a tuple of (x,y)
+        """
+        pass
+
+    @abstractmethod
+    def update(self, result):
+        """
+        Notify the AI of the result of the previous move
+        result is a MoveResult object
+        return is void
+        """
+        pass
+
+
+def run_games(config, num_games, ai):
+    results = []
+    for x in xrange(num_games):
+        game = Game(config)
+        ai.init(config)
+        while not game.is_game_over():
+            coords = ai.next()
+            result = game.select(*coords)
+            if result is None:
+                continue
+            if not result.explosion:
+                ai.update(result)
+        results.append(GameResult(not game.explosion, game.num_moves))
+    return results
