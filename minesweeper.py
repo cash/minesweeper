@@ -61,10 +61,13 @@ class Game(object):
         return self.explosion or self.num_exposed_squares == self.num_safe_squares
 
     def _place_mines(self):
-        for i in xrange(self.num_mines):
+        mines = set()
+        while len(mines) < self.num_mines:
             x = random.randint(0, self.width - 1)
             y = random.randint(0, self.height - 1)
-            self.board[x][y] = True
+            mines.add((x, y))
+        for coords in mines:
+            self.board[coords[0]][coords[1]] = True
 
     def _init_counts(self):
         """Calculates how many neighboring squares have minds for all squares"""

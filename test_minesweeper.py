@@ -17,6 +17,10 @@ class MineSweeperTestCase(unittest.TestCase):
         game.num_moves = 0
         game._init_counts()
 
+    def test_place_mines(self):
+        game = Game(GameConfig(100, 100, 800))
+        self.assertEqual(800, sum([row.count(True) for row in game.board]))
+
     def test_init_counts(self):
         game = Game(GameConfig(5, 4, 4))
         board = self.flip([
