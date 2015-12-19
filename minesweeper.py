@@ -41,6 +41,7 @@ class Game(object):
         self.num_moves += 1
         if self.board[x][y]:
             self.explosion = True
+            self.exposed[x][y] = True
             return MoveResult(True)
         return MoveResult(False, self._update_board(x, y))
 
@@ -179,17 +180,20 @@ class GameAI(object):
         pass
 
 
-def run_games(config, num_games, ai):
+def run_games(config, num_games, ai, viz=None):
     results = []
     for x in xrange(num_games):
         game = Game(config)
         ai.init(config)
+        if viz: viz.start(game)
         while not game.is_game_over():
             coords = ai.next()
             result = game.select(*coords)
             if result is None:
                 continue
+            if viz: viz.update(game)
             if not result.explosion:
                 ai.update(result)
+        if viz: viz.finish()
         results.append(GameResult(not game.explosion, game.num_moves))
     return results
