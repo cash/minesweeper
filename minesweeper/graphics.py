@@ -15,7 +15,7 @@ class GameVisualizer(object):
     """
     Construct a graphical game visualizer
 
-    pause: how long to pause between moves in seconds
+    pause: how long to pause between moves in seconds or 'key' for pressing enter to continue
     """
     def __init__(self, pause=3):
         self.pause = pause
@@ -40,7 +40,10 @@ class GameVisualizer(object):
 
     def update(self, game):
         self._draw(game)
-        time.sleep(self.pause)
+        if isinstance(self.pause, int):
+            time.sleep(self.pause)
+        else:
+            raw_input()
 
     def finish(self):
         pygame.quit()
