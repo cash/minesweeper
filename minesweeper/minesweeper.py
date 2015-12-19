@@ -29,8 +29,8 @@ class Game(object):
         """
         Select a square to expose. Coordinates are zero based.
         If the square has already been selected, returns None.
-        Returns a Result object with success/failure and a list of squares
-        exposed.
+        Returns a MoveResult object with success/failure and a 
+	list of squares exposed.
         """
         if self._is_outside_board(x, y):
             raise ValueError('Position ({0},{1}) is outside the board'.format(x, y))
@@ -180,6 +180,11 @@ class GameAI(object):
         pass
 
 
+"""
+Run a set of games to evaluate a GameAI
+
+Returns a list of GameResult objects
+"""
 def run_games(config, num_games, ai, viz=None):
     results = []
     for x in xrange(num_games):
