@@ -1,11 +1,12 @@
 import pygame
 import time
+import os
 
 
 class GameVisualizer(object):
     TILE_SIZE = 16
     COLOR_GRAY = (189, 189, 189)
-    TILES_FILENAME = 'tiles.png'
+    TILES_FILENAME = os.path.join(os.path.dirname(__file__), 'tiles.png')
     TILE_HIDDEN = 9
     TILE_EXPLODED = 10
     TILE_BOMB = 11

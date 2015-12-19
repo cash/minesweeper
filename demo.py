@@ -1,5 +1,4 @@
 import minesweeper as ms
-import graphics as g
 import random
 
 
@@ -31,7 +30,7 @@ class RandomAI(ms.GameAI):
 num_games = 1
 config = ms.GameConfig()
 ai = RandomAI()
-viz = g.GameVisualizer(3)
+viz = ms.GameVisualizer(3)
 results = ms.run_games(config, 1, ai, viz)
 if results[0].success:
     print('Success!')
