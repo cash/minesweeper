@@ -10,6 +10,7 @@ class GameVisualizer(object):
     TILE_HIDDEN = 9
     TILE_EXPLODED = 10
     TILE_BOMB = 11
+    TILE_FLAG = 12
     WINDOW_NAME = 'Minesweeper'
 
     """
@@ -61,7 +62,10 @@ class GameVisualizer(object):
         for x in range(self.game_width):
             for y in range(self.game_height):
                 if not game.exposed[x][y]:
-                    tile = self.tiles[self.TILE_HIDDEN]
+                    if (x, y) in game.flags:
+                        tile = self.tiles[self.TILE_FLAG]
+                    else:
+                        tile = self.tiles[self.TILE_HIDDEN]
                 else:
                     if game.board[x][y]:
                         tile = self.tiles[self.TILE_EXPLODED]

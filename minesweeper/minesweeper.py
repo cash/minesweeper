@@ -21,6 +21,7 @@ class Game(object):
         self.num_safe_squares = self.width * self.height - self.num_mines
         self.num_exposed_squares = 0
         self.explosion = False
+        self.flags = []
 
         self._place_mines()
         self._init_counts()
@@ -60,6 +61,9 @@ class Game(object):
 
     def is_game_over(self):
         return self.explosion or self.num_exposed_squares == self.num_safe_squares
+
+    def set_flags(self, flags):
+        self.flags = flags
 
     def _place_mines(self):
         mines = set()
@@ -179,6 +183,12 @@ class GameAI(object):
         """
         pass
 
+    def get_flags(self):
+        """
+        Return a list of coordinates for known mines. The coordinates are 2d tuples.
+        """
+        return []
+
 
 """
 Run a set of games to evaluate a GameAI
@@ -196,9 +206,10 @@ def run_games(config, num_games, ai, viz=None):
             result = game.select(*coords)
             if result is None:
                 continue
-            if viz: viz.update(game)
             if not result.explosion:
                 ai.update(result)
+                game.set_flags(ai.get_flags())
+            if viz: viz.update(game)
         if viz: viz.finish()
         results.append(GameResult(not game.explosion, game.num_moves))
     return results
