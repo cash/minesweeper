@@ -6,6 +6,12 @@ playing tend to not place any mines until the player has selected the first
 square and may layout the mines to guarantee success if the player is perfect.
 This implementation does neither.
 
+Installing
+---------------
+This requires pygame. On a Debian-based system, it can be installed with 
+```sudo apt-get install python-pygame```. Full instructions for installing 
+pygame are at http://www.pygame.org/download.shtml.
+
 Running a game
 ----------------
 The minesweeper module contains a run function that accepts the game configuration, 
@@ -76,3 +82,11 @@ The visualizer is then passed to the run function:
 ```python
 results = run_games(config, num_games, ai, viz)
 ```
+
+Standard game sizes
+-------------------------
+Classic Microsoft Minesweeper had 3 standard game sizes:
+ * Beginner: 8 x 8 with 10 mines
+ * Intermediate: 16 x 16 with 40 mines
+ * Expert: 30 x 16 with 99 mines
+
