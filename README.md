@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/cash/minesweeper.svg?branch=master)](https://travis-ci.org/cash/minesweeper)
+[![Build Status](https://travis-ci.org/cash/minesweeper.svg?branch=master)](https://travis-ci.org/cash/minesweeper) [![Coverage Status](https://coveralls.io/repos/cash/minesweeper/badge.svg?branch=master&service=github)](https://coveralls.io/github/cash/minesweeper?branch=master)
 
 Minesweeper Engine
 ==================
