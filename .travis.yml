@@ -9,5 +9,10 @@ before_install:
     - sudo apt-get install -y -qq python-pygame
 virtualenv:
     system_site_packages: true
+install:
+    - pip install python-coveralls
+    - pip install coverage
 script:
     - nosetests test_minesweeper.py
+after_success:
+    - coveralls
