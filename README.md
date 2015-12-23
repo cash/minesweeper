@@ -1,3 +1,5 @@
+![Build status](https://travis-ci.org/cash/minesweeper.svg)
+
 Minesweeper Engine
 ==================
 This is a minesweeper implementation in python. It is not an interactive game,
