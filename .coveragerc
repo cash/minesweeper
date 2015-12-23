@@ -1,5 +1,3 @@
-[report]
-omit =
-    */python?.?/*
-    */site-packages/nose/*
-    minesweeper/graphics.py   
+[run]
+include =
+    minesweeper/minesweeper.py
