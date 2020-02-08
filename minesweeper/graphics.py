@@ -1,6 +1,7 @@
-import pygame
-import time
 import os
+import time
+
+import pygame
 
 
 class GameVisualizer(object):
@@ -44,7 +45,7 @@ class GameVisualizer(object):
         if isinstance(self.pause, int):
             time.sleep(self.pause)
         else:
-            raw_input()
+            input()
 
     def finish(self):
         pygame.quit()
@@ -53,7 +54,7 @@ class GameVisualizer(object):
         image = pygame.image.load(self.TILES_FILENAME).convert()
         image_width, image_height = image.get_size()
         tiles = []
-        for tile_x in range(0, image_width / self.TILE_SIZE):
+        for tile_x in range(0, image_width // self.TILE_SIZE):
             rect = (tile_x * self.TILE_SIZE, 0, self.TILE_SIZE, self.TILE_SIZE)
             tiles.append(image.subsurface(rect))
         return tiles

@@ -1,5 +1,6 @@
-import minesweeper as ms
 import random
+
+import minesweeper as ms
 
 
 class RandomAI(ms.GameAI):
