@@ -6,7 +6,7 @@ os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = 'off'
 import pygame
 
 
-class GameVisualizer(object):
+class GameVisualizer:
     TILE_SIZE = 16
     COLOR_GRAY = (189, 189, 189)
     TILES_FILENAME = os.path.join(os.path.dirname(__file__), 'tiles.png')

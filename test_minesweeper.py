@@ -1,5 +1,5 @@
 import unittest
-from minesweeper import Game, GameConfig, Position
+import minesweeper as ms
 
 
 class MineSweeperTestCase(unittest.TestCase):
@@ -10,19 +10,19 @@ class MineSweeperTestCase(unittest.TestCase):
 
     def reinit_game(self, game, board):
         game.board = board
-        game.counts = [[0 for y in xrange(game.height)] for x in xrange(game.width)]
-        game.exposed = [[False for y in xrange(game.height)] for x in xrange(game.width)]
+        game.counts = [[0 for y in range(game.height)] for x in range(game.width)]
+        game.exposed = [[False for y in range(game.height)] for x in range(game.width)]
         game.explosion = False
         game.num_exposed_squares = 0
         game.num_moves = 0
         game._init_counts()
 
     def test_place_mines(self):
-        game = Game(GameConfig(100, 100, 800))
+        game = ms.Game(ms.GameConfig(100, 100, 800))
         self.assertEqual(800, sum([row.count(True) for row in game.board]))
 
     def test_init_counts(self):
-        game = Game(GameConfig(5, 4, 4))
+        game = ms.Game(ms.GameConfig(5, 4, 4))
         board = self.flip([
             [True,  False, False, False, False],
             [False, False, False, True,  False],
@@ -39,7 +39,7 @@ class MineSweeperTestCase(unittest.TestCase):
         self.assertEqual(counts, game.counts)
 
     def test_select(self):
-        game = Game(GameConfig(3, 3, 2))
+        game = ms.Game(ms.GameConfig(3, 3, 2))
         board = self.flip([
             [False, True,  False],
             [False, False, False],
@@ -51,15 +51,15 @@ class MineSweeperTestCase(unittest.TestCase):
         result = game.select(1, 1)
         self.assertFalse(result.explosion)
         self.assertEqual(1, len(result.new_squares))
-        self.assertEqual(result.new_squares[0], Position(1, 1, 2))
+        self.assertEqual(result.new_squares[0], ms.Position(1, 1, 2))
 
         #expose neighbors
         result = game.select(0, 2)
         self.assertFalse(result.explosion)
         self.assertEqual(3, len(result.new_squares))
-        self.assertTrue(Position(0, 2, 0) in result.new_squares)
-        self.assertTrue(Position(0, 1, 1) in result.new_squares)
-        self.assertTrue(Position(1, 2, 1) in result.new_squares)
+        self.assertTrue(ms.Position(0, 2, 0) in result.new_squares)
+        self.assertTrue(ms.Position(0, 1, 1) in result.new_squares)
+        self.assertTrue(ms.Position(1, 2, 1) in result.new_squares)
 
         #select square already selected or exposed
         self.assertIsNone(game.select(0, 2))
@@ -78,7 +78,7 @@ class MineSweeperTestCase(unittest.TestCase):
             game.select(2, 0)
 
     def test_is_game_over(self):
-        game = Game(GameConfig(3, 3, 1))
+        game = ms.Game(ms.GameConfig(3, 3, 1))
         board = self.flip([
             [False, False, True],
             [False, False, False],
@@ -102,7 +102,7 @@ class MineSweeperTestCase(unittest.TestCase):
         self.assertTrue(game.is_game_over())
 
     def test_get_state(self):
-        game = Game(GameConfig(3, 3, 3))
+        game = ms.Game(ms.GameConfig(3, 3, 3))
         board = self.flip([
             [False, False, True],
             [False, False, False],
