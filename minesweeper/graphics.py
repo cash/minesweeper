@@ -9,6 +9,7 @@ from .minesweeper import GameVisualizer
 
 
 class PyGameVisualizer(GameVisualizer):
+    """Visualize a minesweeper game with PyGame"""
     TILE_SIZE = 16
     COLOR_GRAY = (189, 189, 189)
     TILES_FILENAME = os.path.join(os.path.dirname(__file__), 'tiles.png')
@@ -18,12 +19,11 @@ class PyGameVisualizer(GameVisualizer):
     TILE_FLAG = 12
     WINDOW_NAME = 'Minesweeper'
 
-    """
-    Construct a graphical game visualizer
-
-    pause: how long to pause between moves in seconds or 'key' for pressing enter to continue
-    """
     def __init__(self, pause=3):
+        """
+        Args:
+            pause (int, str): How long to pause between moves in seconds or 'key' for pressing enter to continue
+        """
         self.pause = pause
         self.game_width = 0
         self.game_height = 0
@@ -49,7 +49,7 @@ class PyGameVisualizer(GameVisualizer):
         if isinstance(self.pause, int):
             time.sleep(self.pause)
         else:
-            input()
+            input("Press enter to continue")
 
     def finish(self, game):
         pygame.quit()
