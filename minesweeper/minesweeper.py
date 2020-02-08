@@ -213,24 +213,23 @@ class Game:
         stack = [(x, y)]
         while len(stack) > 0:
             (x, y) = stack.pop()
-            for x_offset in [-1, 0, 1]:
-                for y_offset in [-1, 0, 1]:
-                    if x_offset != 0 or y_offset != 0:
-                        new_x = x + x_offset
-                        new_y = y + y_offset
-                        if not self._is_outside_board(new_x, new_y):
-                            if not self.exposed[new_x][new_y]:
-                                self._expose_square(new_x, new_y)
-                                squares.append(Square(new_x, new_y, self.counts[new_x][new_y]))
-                                if self._test_count(new_x, new_y):
-                                    stack.append((new_x, new_y))
+            for dx, dy in itertools.product([-1, 0, 1], repeat=2):
+                if dx == 0 and dy == 0:
+                    continue
+                new_x, new_y = x + dx, y + dy
+                if not self._is_outside_board(new_x, new_y):
+                    if not self.exposed[new_x][new_y]:
+                        self._expose_square(new_x, new_y)
+                        squares.append(Square(new_x, new_y, self.counts[new_x][new_y]))
+                        if self._test_if_count_0(new_x, new_y):
+                            stack.append((new_x, new_y))
         return squares
 
     def _expose_square(self, x, y):
         self.exposed[x][y] = True
         self._num_exposed_squares += 1
 
-    def _test_count(self, x, y):
+    def _test_if_count_0(self, x, y):
         """Does this square have a count of zero?"""
         return self.counts[x][y] == 0
 
