@@ -1,13 +1,12 @@
 import minesweeper as ms
 
-
 num_games = 1
 config = ms.GameConfig()
 ai = ms.RandomAI()
-viz = ms.GameVisualizer('key')
-results = ms.run_games(config, 1, ai, viz)
-if results[0].success:
-    print('Success!')
+viz = ms.PyGameVisualizer('key')
+result = ms.run_games(config, num_games, ai, viz).pop()
+if result.victory:
+    print('Victory!')
 else:
     print('Boom!')
-print('Game lasted {0} moves'.format(results[0].num_moves))
+print('Game lasted {0} moves'.format(result.num_moves))

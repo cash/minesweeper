@@ -5,8 +5,10 @@ import time
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = 'off'
 import pygame
 
+from .minesweeper import GameVisualizer
 
-class GameVisualizer:
+
+class PyGameVisualizer(GameVisualizer):
     TILE_SIZE = 16
     COLOR_GRAY = (189, 189, 189)
     TILES_FILENAME = os.path.join(os.path.dirname(__file__), 'tiles.png')
@@ -49,7 +51,7 @@ class GameVisualizer:
         else:
             input()
 
-    def finish(self):
+    def finish(self, game):
         pygame.quit()
 
     def _load_tiles(self):
@@ -70,7 +72,7 @@ class GameVisualizer:
                     else:
                         tile = self.tiles[self.TILE_HIDDEN]
                 else:
-                    if game.board[x][y]:
+                    if game.mines[x][y]:
                         tile = self.tiles[self.TILE_EXPLODED]
                     else:
                         tile = self.tiles[game.counts[x][y]]
