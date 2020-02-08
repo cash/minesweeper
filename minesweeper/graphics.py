@@ -1,6 +1,8 @@
 import os
 import time
 
+# turn off pygame printing a message on import
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = 'off'
 import pygame
 
 
