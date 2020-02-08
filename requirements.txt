@@ -1,0 +1,4 @@
+pygame
+nose
+coverage
+python-coveralls
