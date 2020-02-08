@@ -84,7 +84,6 @@ class Game:
         mines (list): 2d list of booleans indicating mine locations.
         exposed (list): 2d list of booleans indicating exposed squares.
         counts (list): 2d list of integer counts of neighboring mines.
-        flags (set): set of (x,y) tuples for flag positions.
     """
 
     def __init__(self, config):
@@ -98,10 +97,19 @@ class Game:
         self.mines = [[False for y in range(self.height)] for x in range(self.width)]
         self.exposed = [[False for y in range(self.height)] for x in range(self.width)]
         self.counts = [[0 for y in range(self.height)] for x in range(self.width)]
-        self.flags = {}
+        self._flags = {}
 
         self._place_mines()
         self._init_counts()
+
+    @property
+    def flags(self):
+        """set: set of (x,y) tuples for flag positions"""
+        return self._flags
+
+    @flags.setter
+    def flags(self, flags):
+        self._flags = set(flags)
 
     @property
     def state(self):
@@ -158,9 +166,6 @@ class Game:
         # must call update before accessing the status
         squares = self._update(x, y)
         return MoveResult(self.status, squares)
-
-    def set_flags(self, flags):
-        self.flags = flags
 
     def _place_mines(self):
         locations = set()
@@ -258,13 +263,12 @@ class GameAI(abc.ABC):
         """
         pass
 
+    @property
     def flags(self):
-        """Get a list of guessed mine locations
+        """list: Get a list of guessed mine locations
 
+        The locations are x,y tuples.
         This is for display only. Override if desired.
-
-        Returns:
-            list: List 2d tuples with x,y positions
         """
         return []
 
@@ -347,7 +351,7 @@ def run_games(config, num_games, ai, viz=None):
             result = game.select(*coords)
             ai.update(result)
             if result.status == GameStatus.PLAYING:
-                game.set_flags(ai.flags())
+                game.flags = ai.flags
             if viz: viz.update(game)
         if viz: viz.finish(game)
         results.append(game.result)
