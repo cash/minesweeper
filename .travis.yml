@@ -1,12 +1,9 @@
 language: python
 python:
     - "3.6"
-branches:
-    only:
-        - master
 install:
     - pip install -r requirements.txt
 script:
-    - nosetests --with-coverage test_minesweeper.py
+    - pytest --cov minesweeper
 after_success:
     - coveralls

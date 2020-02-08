@@ -1,7 +1,0 @@
-[run]
-include =
-    minesweeper/minesweeper.py
-
-[report]
-include =
-    minesweeper/minesweeper.py

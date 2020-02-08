@@ -1,4 +1,5 @@
 import abc
+import copy
 import enum
 import itertools
 import random
@@ -86,7 +87,12 @@ class Game:
         counts (list): 2d list of integer counts of neighboring mines.
     """
 
-    def __init__(self, config):
+    def __init__(self, config, mines=None):
+        """
+        Args:
+            config (GameConfig): Configuration for this game.
+            mines (list, optional): Optional mine positions.
+        """
         self.width = config.width
         self.height = config.height
         self.num_mines = config.num_mines
@@ -94,12 +100,15 @@ class Game:
         self._num_exposed_squares = 0
         self._explosion = False
         self._num_safe_squares = self.width * self.height - self.num_mines
-        self.mines = [[False for y in range(self.height)] for x in range(self.width)]
         self.exposed = [[False for y in range(self.height)] for x in range(self.width)]
         self.counts = [[0 for y in range(self.height)] for x in range(self.width)]
         self._flags = {}
 
-        self._place_mines()
+        if mines:
+            self.mines = copy.deepcopy(mines)
+        else:
+            self.mines = [[False for y in range(self.height)] for x in range(self.width)]
+            self._place_mines()
         self._init_counts()
 
     @property
