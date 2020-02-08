@@ -2,7 +2,10 @@ import abc
 import copy
 import enum
 import itertools
+import logging
 import random
+
+logger = logging.getLogger(__name__)
 
 
 class GameConfig:
@@ -110,6 +113,7 @@ class Game:
             self.mines = [[False for y in range(self.height)] for x in range(self.width)]
             self._place_mines()
         self._init_counts()
+        logger.info("Game initialized")
 
     @property
     def flags(self):
@@ -165,6 +169,7 @@ class Game:
         Raises:
             ValueError: if game over, squared already selected, or position off the board
         """
+        logger.info("Player has picked %d, %d", x, y)
         if self._is_outside_board(x, y):
             raise ValueError('Position ({},{}) is outside the board'.format(x, y))
         if self._explosion:
@@ -174,6 +179,7 @@ class Game:
         self.num_moves += 1
         # must call update before accessing the status
         squares = self._update(x, y)
+        logger.info("%d squares are revealed", len(squares))
         return MoveResult(self.status, squares)
 
     def _place_mines(self):
@@ -298,7 +304,6 @@ class RandomAI(GameAI):
             y = random.randint(0, self.height - 1)
             if (x, y) not in self.exposed_squares:
                 break
-        print('selecting point ({0},{1})'.format(x, y))
         return x, y
 
     def update(self, result):
@@ -350,7 +355,8 @@ def run_games(config, num_games, ai, viz=None):
         list: List of GameResult objects
     """
     results = []
-    for x in range(num_games):
+    for n in range(num_games):
+        logger.info("Starting game %d", n + 1)
         game = Game(config)
         ai.reset(config)
         if viz: viz.start(game)
@@ -360,6 +366,8 @@ def run_games(config, num_games, ai, viz=None):
             ai.update(result)
             if result.status == GameStatus.PLAYING:
                 game.flags = ai.flags
+            else:
+                logger.info("Game is over")
             if viz: viz.update(game)
         if viz: viz.finish(game)
         results.append(game.result)
