@@ -342,14 +342,26 @@ class GameVisualizer(abc.ABC):
         pass
 
 
-def run_games(config, num_games, ai, viz=None):
+class NullVisualizer(GameVisualizer):
+    """Does nothing"""
+    def start(self, game):
+        pass
+
+    def update(self, game):
+        pass
+
+    def finish(self, game):
+        pass
+
+
+def run_games(config, num_games, ai, viz=NullVisualizer()):
     """ Run a set of games to evaluate an AI
 
     Args:
         config (GameConfig): Parameters of the game.
         num_games (int): Number of games.
         ai (GameAI): The AI
-        viz (, optional): Visualizer
+        viz (GameVisualizer, optional): Visualizer
 
     Returns:
         list: List of GameResult objects
@@ -359,7 +371,7 @@ def run_games(config, num_games, ai, viz=None):
         logger.info("Starting game %d", n + 1)
         game = Game(config)
         ai.reset(config)
-        if viz: viz.start(game)
+        viz.start(game)
         while not game.game_over:
             coords = ai.next()
             result = game.select(*coords)
@@ -368,7 +380,7 @@ def run_games(config, num_games, ai, viz=None):
                 game.flags = ai.flags
             else:
                 logger.info("Game is over")
-            if viz: viz.update(game)
-        if viz: viz.finish(game)
+            viz.update(game)
+        viz.finish(game)
         results.append(game.result)
     return results
