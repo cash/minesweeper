@@ -4,6 +4,7 @@ import time
 # turn off pygame printing a message on import
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = 'off'
 import pygame
+import pygame.locals
 
 from .minesweeper import GameVisualizer
 
@@ -36,6 +37,7 @@ class PyGameVisualizer(GameVisualizer):
         self.game_height = game.height
 
         pygame.init()
+        pygame.mixer.quit()  # if we don't turn off sound, uses 100% cpu
         pygame.display.set_caption(self.WINDOW_NAME)
         screen_width = self.TILE_SIZE * self.game_width
         screen_height = self.TILE_SIZE * self.game_height
@@ -43,13 +45,25 @@ class PyGameVisualizer(GameVisualizer):
         self.screen.fill(self.COLOR_GRAY)
         self.tiles = self._load_tiles()
 
+        next(runner)
         self._draw(game)
-        for _ in runner:
-            self._draw(game)
-            if isinstance(self.pause, int):
+        if isinstance(self.pause, str):
+            print("Press any key for each move")
+            pygame.event.clear()
+            while not game.game_over:
+                event = pygame.event.wait()
+                if event.type == pygame.locals.KEYDOWN:
+                    next(runner)
+                    self._draw(game)
+                elif event.type == pygame.locals.QUIT:
+                    game.quit()
+                    break
+        else:
+            while not game.game_over:
                 time.sleep(self.pause)
-            else:
-                input("Press enter to continue")
+                next(runner)
+                self._draw(game)
+
         pygame.quit()
 
     def _load_tiles(self):

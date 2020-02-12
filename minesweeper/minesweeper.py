@@ -166,6 +166,7 @@ class Game:
 
     def quit(self):
         """Quit a game"""
+        logger.info("Quitting")
         self._quit = True
 
     def select(self, x, y):
