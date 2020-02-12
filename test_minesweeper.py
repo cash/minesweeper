@@ -106,7 +106,6 @@ def test_select_when_game_is_already_over(game2):
 def test_select_with_mine(game2):
     result = game2.select(1, 0)
     assert game2.game_over
-    assert ms.GameStatus.DEFEAT == result.status
     assert 1 == len(result.new_squares)
     assert ms.Square(1, 0, 0) in result.new_squares
 
@@ -114,7 +113,6 @@ def test_select_with_mine(game2):
 def test_select_with_victory(game3):
     result = game3.select(0, 0)
     assert 8 == len(result.new_squares)
-    assert ms.GameStatus.VICTORY == result.status
     assert game3.game_over
 
 
@@ -123,10 +121,44 @@ def test_game_result_when_game_over(game3):
     assert game3.result.victory
     assert 1 == game3.result.num_moves
 
+
 def test_game_result_when_not_over(game2):
     game2.select(0, 0)
     with pytest.raises(ValueError):
         game2.result
+
+
+def test_game_result_after_quitting(game2):
+    game2.select(0, 0)
+    game2.quit()
+    assert not game2.result.victory
+    assert 1 == game2.result.num_moves
+
+
+def test_game_over_after_quit(game2):
+    game2.select(0, 0)
+    game2.quit()
+    assert game2.game_over
+
+
+def test_status_at_beginning_of_game(game2):
+    assert ms.GameStatus.PLAYING == game2.status
+
+
+def test_status_after_mine_explosion(game2):
+    game2.select(1, 0)
+    assert ms.GameStatus.DEFEAT == game2.status
+
+
+def test_status_after_victory(game3):
+    game3.select(0, 0)
+    assert ms.GameStatus.VICTORY == game3.status
+
+
+def test_status_after_quitting(game2):
+    game2.select(0, 0)
+    game2.quit()
+    assert ms.GameStatus.QUIT == game2.status
 
 
 def test_state_at_start(game4):

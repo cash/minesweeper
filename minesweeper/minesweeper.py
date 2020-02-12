@@ -27,6 +27,7 @@ class GameStatus (enum.Enum):
     PLAYING = 1
     VICTORY = 2
     DEFEAT = 3
+    QUIT = 4
 
 
 class GameResult:
@@ -102,6 +103,7 @@ class Game:
         self.num_moves = 0
         self._num_exposed_squares = 0
         self._explosion = False
+        self._quit = False
         self._num_safe_squares = self.width * self.height - self.num_mines
         self.exposed = [[False for y in range(self.height)] for x in range(self.width)]
         self.counts = [[0 for y in range(self.height)] for x in range(self.width)]
@@ -139,22 +141,32 @@ class Game:
     @property
     def status(self):
         """GameStatus: Current status of the game"""
-        status = GameStatus.PLAYING
-        if self.game_over:
-            status = GameStatus.DEFEAT if self._explosion else GameStatus.VICTORY
+        if not self.game_over:
+            status = GameStatus.PLAYING
+        elif self._quit:
+            status = GameStatus.QUIT
+        elif self._explosion:
+            status = GameStatus.DEFEAT
+        else:
+            status = GameStatus.VICTORY
         return status
 
     @property
     def game_over(self):
         """bool: Is the game over"""
-        return self._explosion or self._num_exposed_squares == self._num_safe_squares
+        return self._explosion or self._quit or \
+               self._num_exposed_squares == self._num_safe_squares
 
     @property
     def result(self):
         """GameResult: information about the game result"""
         if not self.game_over:
             raise ValueError('Game is not over')
-        return GameResult(not self._explosion, self.num_moves)
+        return GameResult(self.status == GameStatus.VICTORY, self.num_moves)
+
+    def quit(self):
+        """Quit a game"""
+        self._quit = True
 
     def select(self, x, y):
         """Select a square to expose.
