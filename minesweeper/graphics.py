@@ -30,7 +30,8 @@ class PyGameVisualizer(GameVisualizer):
         self.screen = None
         self.tiles = None
 
-    def run(self, game):
+    def run(self, runner):
+        game = runner.game
         self.game_width = game.width
         self.game_height = game.height
 
@@ -43,7 +44,7 @@ class PyGameVisualizer(GameVisualizer):
         self.tiles = self._load_tiles()
 
         self._draw(game)
-        for _ in game:
+        for _ in runner:
             self._draw(game)
             if isinstance(self.pause, int):
                 time.sleep(self.pause)

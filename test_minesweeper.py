@@ -8,17 +8,6 @@ def flip(array):
     return [list(a) for a in zip(*array)]
 
 
-class MockAI(ms.GameAI):
-    def reset(self, config):
-        pass
-
-    def next(self):
-        pass
-
-    def update(self, result):
-        pass
-
-
 @pytest.fixture
 def game1():
     mines = flip([
@@ -27,7 +16,7 @@ def game1():
         [False, False, False, True,  False],
         [False, False, True,  False, False]
     ])
-    return ms.Game(ms.GameConfig(5, 4, 4), MockAI(), mines)
+    return ms.Game(ms.GameConfig(5, 4, 4), mines)
 
 
 @pytest.fixture
@@ -37,7 +26,7 @@ def game2():
         [False, False, False],
         [False, False, True]
     ])
-    return ms.Game(ms.GameConfig(3, 3, 2), MockAI(), mines)
+    return ms.Game(ms.GameConfig(3, 3, 2), mines)
 
 
 @pytest.fixture
@@ -47,7 +36,7 @@ def game3():
         [False, False, False],
         [False, False, True]
     ])
-    return ms.Game(ms.GameConfig(3, 3, 1), MockAI(), mines)
+    return ms.Game(ms.GameConfig(3, 3, 1), mines)
 
 
 @pytest.fixture
@@ -57,11 +46,11 @@ def game4():
         [False, False, False],
         [True,  False, True]
     ])
-    return ms.Game(ms.GameConfig(3, 3, 3), MockAI(), mines)
+    return ms.Game(ms.GameConfig(3, 3, 3), mines)
 
 
 def test_game_init_for_total_mine_count():
-    game = ms.Game(ms.GameConfig(100, 100, 800), None)
+    game = ms.Game(ms.GameConfig(100, 100, 800))
     assert 800 == sum(row.count(True) for row in game.mines)
 
 

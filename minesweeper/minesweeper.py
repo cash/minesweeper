@@ -90,7 +90,7 @@ class Game:
         counts (list): 2d list of integer counts of neighboring mines.
     """
 
-    def __init__(self, config, ai, mines=None):
+    def __init__(self, config, mines=None):
         """
         Args:
             config (GameConfig): Configuration for this game.
@@ -99,7 +99,6 @@ class Game:
         self.width = config.width
         self.height = config.height
         self.num_mines = config.num_mines
-        self.ai = ai
         self.num_moves = 0
         self._num_exposed_squares = 0
         self._explosion = False
@@ -156,23 +155,6 @@ class Game:
         if not self.game_over:
             raise ValueError('Game is not over')
         return GameResult(not self._explosion, self.num_moves)
-
-    def __iter__(self):
-        """Returns an iterator"""
-        return self
-
-    def __next__(self):
-        """Advances the game one move"""
-        if not self.game_over:
-            coordinates = self.ai.next()
-            result = self.select(*coordinates)
-            self.ai.update(result)
-            if result.status == GameStatus.PLAYING:
-                self.flags = self.ai.flags
-            else:
-                logger.info("Game is over")
-        else:
-            raise StopIteration()
 
     def select(self, x, y):
         """Select a square to expose.
@@ -333,13 +315,42 @@ class GameVisualizer(abc.ABC):
     """Game visualization base class"""
 
     @abc.abstractmethod
-    def run(self, game):
+    def run(self, runner):
         """Run a game and display visualization
 
         Args:
-            game (Game): Minesweeper game object.
+            runner (Runner): Game runner (iterator).
         """
         pass
+
+
+class Runner:
+    """Game Runner as iterator
+
+    Attributes:
+        game (Game): Minesweeper game
+        ai (GameAI): Minesweeper AI
+    """
+    def __init__(self, game, ai):
+        self.game = game
+        self.ai = ai
+
+    def __iter__(self):
+        """Returns an iterator"""
+        return self
+
+    def __next__(self):
+        """Advances the game one move"""
+        if not self.game.game_over:
+            coordinates = self.ai.next()
+            result = self.game.select(*coordinates)
+            self.ai.update(result)
+            if result.status == GameStatus.PLAYING:
+                self.game.flags = self.ai.flags
+            else:
+                logger.info("Game is over")
+        else:
+            raise StopIteration()
 
 
 def run_games(config, num_games, ai, viz=None):
@@ -358,11 +369,12 @@ def run_games(config, num_games, ai, viz=None):
     for n in range(num_games):
         logger.info("Starting game %d", n + 1)
         ai.reset(config)
-        game = Game(config, ai)
+        game = Game(config)
+        runner = Runner(game, ai)
         if viz:
-            viz.run(game)
+            viz.run(runner)
         else:
-            for _ in game:
+            for _ in runner:
                 pass
         results.append(game.result)
     return results
