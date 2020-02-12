@@ -90,7 +90,7 @@ class Game:
         counts (list): 2d list of integer counts of neighboring mines.
     """
 
-    def __init__(self, config, mines=None):
+    def __init__(self, config, ai, mines=None):
         """
         Args:
             config (GameConfig): Configuration for this game.
@@ -99,6 +99,7 @@ class Game:
         self.width = config.width
         self.height = config.height
         self.num_mines = config.num_mines
+        self.ai = ai
         self.num_moves = 0
         self._num_exposed_squares = 0
         self._explosion = False
@@ -155,6 +156,23 @@ class Game:
         if not self.game_over:
             raise ValueError('Game is not over')
         return GameResult(not self._explosion, self.num_moves)
+
+    def __iter__(self):
+        """Returns an iterator"""
+        return self
+
+    def __next__(self):
+        """Advances the game one move"""
+        if not self.game_over:
+            coordinates = self.ai.next()
+            result = self.select(*coordinates)
+            self.ai.update(result)
+            if result.status == GameStatus.PLAYING:
+                self.flags = self.ai.flags
+            else:
+                logger.info("Game is over")
+        else:
+            raise StopIteration()
 
     def select(self, x, y):
         """Select a square to expose.
@@ -315,26 +333,8 @@ class GameVisualizer(abc.ABC):
     """Game visualization base class"""
 
     @abc.abstractmethod
-    def start(self, game):
-        """Start visualizing a new game
-
-        Args:
-            game (Game): Minesweeper game object.
-        """
-        pass
-
-    @abc.abstractmethod
-    def update(self, game):
-        """Update the display
-
-        Args:
-            game (Game): Minesweeper game object.
-        """
-        pass
-
-    @abc.abstractmethod
-    def finish(self, game):
-        """Complete the visualization of a game
+    def run(self, game):
+        """Run a game and display visualization
 
         Args:
             game (Game): Minesweeper game object.
@@ -342,19 +342,7 @@ class GameVisualizer(abc.ABC):
         pass
 
 
-class NullVisualizer(GameVisualizer):
-    """Does nothing"""
-    def start(self, game):
-        pass
-
-    def update(self, game):
-        pass
-
-    def finish(self, game):
-        pass
-
-
-def run_games(config, num_games, ai, viz=NullVisualizer()):
+def run_games(config, num_games, ai, viz=None):
     """ Run a set of games to evaluate an AI
 
     Args:
@@ -369,18 +357,12 @@ def run_games(config, num_games, ai, viz=NullVisualizer()):
     results = []
     for n in range(num_games):
         logger.info("Starting game %d", n + 1)
-        game = Game(config)
         ai.reset(config)
-        viz.start(game)
-        while not game.game_over:
-            coords = ai.next()
-            result = game.select(*coords)
-            ai.update(result)
-            if result.status == GameStatus.PLAYING:
-                game.flags = ai.flags
-            else:
-                logger.info("Game is over")
-            viz.update(game)
-        viz.finish(game)
+        game = Game(config, ai)
+        if viz:
+            viz.run(game)
+        else:
+            for _ in game:
+                pass
         results.append(game.result)
     return results

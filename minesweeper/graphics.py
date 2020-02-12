@@ -30,28 +30,25 @@ class PyGameVisualizer(GameVisualizer):
         self.screen = None
         self.tiles = None
 
-    def start(self, game):
-        pygame.init()
-
+    def run(self, game):
         self.game_width = game.width
         self.game_height = game.height
 
+        pygame.init()
         pygame.display.set_caption(self.WINDOW_NAME)
         screen_width = self.TILE_SIZE * self.game_width
         screen_height = self.TILE_SIZE * self.game_height
         self.screen = pygame.display.set_mode((screen_width, screen_height))
         self.screen.fill(self.COLOR_GRAY)
         self.tiles = self._load_tiles()
-        self._draw(game)
 
-    def update(self, game):
         self._draw(game)
-        if isinstance(self.pause, int):
-            time.sleep(self.pause)
-        else:
-            input("Press enter to continue")
-
-    def finish(self, game):
+        for _ in game:
+            self._draw(game)
+            if isinstance(self.pause, int):
+                time.sleep(self.pause)
+            else:
+                input("Press enter to continue")
         pygame.quit()
 
     def _load_tiles(self):
