@@ -260,7 +260,7 @@ class Game:
         return False
 
 
-class GameAI(abc.ABC):
+class AI(abc.ABC):
     """Minesweeper AI Base class"""
 
     @abc.abstractmethod
@@ -300,7 +300,7 @@ class GameAI(abc.ABC):
         return []
 
 
-class RandomAI(GameAI):
+class RandomAI(AI):
     def __init__(self):
         self.width = 0
         self.height = 0
@@ -329,7 +329,7 @@ class Runner:
 
     Attributes:
         game (Game): Minesweeper game
-        ai (GameAI): Minesweeper AI
+        ai (AI): Minesweeper AI
     """
     def __init__(self, game, ai):
         self.game = game
@@ -359,7 +359,7 @@ def run_games(config, num_games, ai, viz=None):
     Args:
         config (GameConfig): Parameters of the game.
         num_games (int): Number of games.
-        ai (GameAI): The AI
+        ai (AI): The AI
         viz (GameVisualizer, optional): Visualizer
 
     Returns:

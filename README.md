@@ -27,7 +27,7 @@ python demo.py
 
 Building your AI
 ------------------
-An AI must implement the ```GameAI``` interface with three methods: `reset()`, `next()`, 
+An AI must implement the ```AI``` interface with three methods: `reset()`, `next()`, 
 and `update()`. `reset()` should clear any state of the AI and is called before starting
 a new game. It receives as a parameter the game configuration which includes the
 width and height of the board and the number of mines. `next()` is called for each move
@@ -41,7 +41,7 @@ An AI that randomly selects each move would look like the following:
 import random
 import minesweeper as ms
 
-class RandomAI(ms.GameAI):
+class RandomAI(ms.AI):
     def __init__(self):
         self.width = 0
         self.height = 0
