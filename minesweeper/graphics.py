@@ -20,12 +20,14 @@ class PyGameVisualizer(GameVisualizer):
     TILE_FLAG = 12
     WINDOW_NAME = 'Minesweeper'
 
-    def __init__(self, pause=3):
+    def __init__(self, pause=3, next_game_prompt=False):
         """
         Args:
-            pause (int, str): How long to pause between moves in seconds or 'key' for pressing enter to continue
+            pause (int, str): How long to pause between moves in seconds or 'key' for pressing enter to continue.
+            next_game_prompt (bool): Whether to ask the user to proceed to next game (or quit).
         """
         self.pause = pause
+        self.next_game_prompt = next_game_prompt
         self.game_width = 0
         self.game_height = 0
         self.screen = None
@@ -63,6 +65,13 @@ class PyGameVisualizer(GameVisualizer):
                 time.sleep(self.pause)
                 next(runner)
                 self._draw(game)
+
+        if self.next_game_prompt:
+            print("Hit any key to continue...")
+            while True:
+                event = pygame.event.wait()
+                if event.type in [pygame.locals.KEYDOWN, pygame.locals.QUIT]:
+                    break
 
         pygame.quit()
 
