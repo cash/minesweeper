@@ -184,3 +184,25 @@ def test_flags(game1):
     game1.flags = [(0, 1)]
     assert isinstance(game1.flags, set)
     assert 1 == len(game1.flags)
+
+
+def test_square_eq_with_match():
+    assert ms.Square(0, 0, 0) == ms.Square(0, 0, 0)
+    assert ms.Square(5, 7, 3) == ms.Square(5, 7, 3)
+
+
+def test_square_eq_with_no_match():
+    assert ms.Square(5, 7, 3) != ms.Square(5, 8, 3)
+    assert ms.Square(5, 7, 3) != ms.Square(4, 7, 3)
+    assert ms.Square(5, 7, 3) != ms.Square(5, 7, 1)
+
+
+def test_square_eq_with_wrong_type():
+    assert ms.Square(1, 2, 3) != 72
+
+
+def test_run_games():
+    config = ms.GameConfig()
+    ai = ms.RandomAI()
+    results = ms.run_games(config, 2, ai)
+    assert 2 == len(results)
