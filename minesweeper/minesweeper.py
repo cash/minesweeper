@@ -324,19 +324,6 @@ class RandomAI(GameAI):
             self.exposed_squares.add((position.x, position.y))
 
 
-class GameVisualizer(abc.ABC):
-    """Game visualization base class"""
-
-    @abc.abstractmethod
-    def run(self, runner):
-        """Run a game and display visualization
-
-        Args:
-            runner (Runner): Game runner (iterator).
-        """
-        pass
-
-
 class Runner:
     """Game Runner as iterator
 

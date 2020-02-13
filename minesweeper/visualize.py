@@ -1,3 +1,4 @@
+import abc
 import os
 import time
 
@@ -6,13 +7,25 @@ os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = 'off'
 import pygame
 import pygame.locals
 
-from .minesweeper import GameVisualizer
+
+class GameVisualizer(abc.ABC):
+    """Game visualization base class"""
+
+    @abc.abstractmethod
+    def run(self, runner):
+        """Run a game and display visualization
+
+        Args:
+            runner (Runner): Game runner (iterator).
+        """
+        pass
 
 
 class PyGameVisualizer(GameVisualizer):
     """Visualize a minesweeper game with PyGame"""
     TILE_SIZE = 16
     COLOR_GRAY = (189, 189, 189)
+    # replace this with importlib.resources when we require Python 3.7
     TILES_FILENAME = os.path.join(os.path.dirname(__file__), 'tiles.png')
     TILE_HIDDEN = 9
     TILE_EXPLODED = 10

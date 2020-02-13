@@ -1,3 +1,2 @@
-from .minesweeper import GameConfig, GameStatus, GameResult, Square, MoveResult, Game, GameAI, RandomAI, \
-    GameVisualizer, run_games
-from .graphics import PyGameVisualizer
+from .minesweeper import GameConfig, GameStatus, GameResult, Square, MoveResult, Game, GameAI, RandomAI, run_games
+from .visualize import GameVisualizer, PyGameVisualizer
