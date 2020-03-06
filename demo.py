@@ -3,6 +3,10 @@ import minesweeper as ms
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
+print("This will play a single game and then quit.")
+print("The minesweeper window needs focus to capture a key press.")
+print()
+
 num_games = 1
 config = ms.GameConfig()
 ai = ms.RandomAI()
